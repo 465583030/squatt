@@ -1,0 +1,14 @@
+language: go
+
+go:
+  - 1.8
+
+install:
+  - make deps
+  - go get -u github.com/mattn/goveralls
+
+script:
+  - make test
+
+after_script:
+  - goveralls -v -service=travis-ci -coverprofile=overalls.coverprofile
