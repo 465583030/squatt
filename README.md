@@ -7,3 +7,11 @@ The SQuaTT MQTT Broker
 ## Status of this project
 
 ⚠️ SQuaTT is still **work in progress**
+
+## Development Setup
+
+```
+make dev-setup
+make deps
+make test
+```

@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Redirect output to stderr.
+exec 1>&2
+
+changed_files=$(git diff --cached --name-only)
+num_changed_files=$(echo $"$changed_files" | wc -l | xargs)
+
+echo "≫ Running pre-commit hooks on $num_changed_files changed files"
+
+echo "  ≫ Running fmt and lint on changed Go files..."
+
+for file in $(echo $"$changed_files" | grep '.go$')
+do
+  echo $file
+  gofmt -w -s $file
+  git add $file
+
+  golintOut=$(golint "$file" 2>&1)
+  [[ -z "$golintOut" ]] || golintList+="$golintOut"$"\n"
+done
+
+if [[ ! -z "$golintList" ]]; then echo "  ≫ Please fix the following errors:"; echo "$golintList\c"; exit 1; fi
+
+if [[ ! -z `$list_changed_files | grep '^main.go$'` ]]
+then
+  echo "  ≫ main.go changed, updating doc..."
+  .script/doc.sh
+  git add doc.go
+fi
+
+echo "≫ Done."
