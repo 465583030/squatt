@@ -7,6 +7,7 @@ import (
 	"github.com/eclipse/paho.mqtt.golang/packets"
 	"github.com/htdvisser/squatt/topic"
 	"github.com/segmentio/ksuid"
+	"go.uber.org/zap"
 )
 
 func (c *Client) handleConnect(packet *packets.ConnectPacket) (err error) {
@@ -26,6 +27,14 @@ func (c *Client) handleConnect(packet *packets.ConnectPacket) (err error) {
 		c.send(connack)
 		return
 	}
+
+	c.log.Info(
+		"accept connect",
+		zap.String("addr", c.remoteAddr),
+		zap.String("id", packet.ClientIdentifier),
+		zap.String("username", packet.Username),
+	)
+
 	if packet.CleanSession {
 		c.session = c.server.sessions.New(packet.ClientIdentifier)
 	} else {

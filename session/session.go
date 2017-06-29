@@ -113,7 +113,7 @@ func (s *Session) SetOnDelete(onDelete func()) {
 
 // SetLogger sets the logger for this session
 func (s *Session) SetLogger(log *zap.Logger) {
-	s.log = log.With(zap.String("sid", s.name))
+	s.log = log.With(zap.String("id", s.name))
 }
 
 // SetPersistent sets the session persistency

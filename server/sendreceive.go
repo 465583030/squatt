@@ -31,14 +31,16 @@ func (c *Client) send(packet packets.ControlPacket) (err error) {
 		return err
 	}
 
+	log := c.log.With(zap.String("addr", c.remoteAddr))
+
 	switch packet := packet.(type) {
 	case *packets.ConnackPacket:
-		c.log.Debug(
+		log.Debug(
 			"send connack",
-			zap.String("return-code", packets.ConnackReturnCodes[packet.ReturnCode]),
+			zap.String("result", packets.ConnackReturnCodes[packet.ReturnCode]),
 		)
 	case *packets.PublishPacket:
-		c.log.Debug(
+		log.Debug(
 			"send publish",
 			zap.Bool("dup", packet.Dup),
 			zap.Bool("ret", packet.Retain),
@@ -48,37 +50,37 @@ func (c *Client) send(packet packets.ControlPacket) (err error) {
 			zap.Uint8("qos", packet.Qos),
 		)
 	case *packets.PubackPacket:
-		c.log.Debug(
+		log.Debug(
 			"send puback",
 			zap.Uint16("mid", packet.MessageID),
 		)
 	case *packets.PubrecPacket:
-		c.log.Debug(
+		log.Debug(
 			"send pubrec",
 			zap.Uint16("mid", packet.MessageID),
 		)
 	case *packets.PubrelPacket:
-		c.log.Debug(
+		log.Debug(
 			"send pubrel",
 			zap.Uint16("mid", packet.MessageID),
 		)
 	case *packets.PubcompPacket:
-		c.log.Debug(
+		log.Debug(
 			"send pubcomp",
 			zap.Uint16("mid", packet.MessageID),
 		)
 	case *packets.SubackPacket:
-		c.log.Debug(
+		log.Debug(
 			"send suback",
 			zap.Uint16("mid", packet.MessageID),
 		)
 	case *packets.UnsubackPacket:
-		c.log.Debug(
+		log.Debug(
 			"send unsuback",
 			zap.Uint16("mid", packet.MessageID),
 		)
 	case *packets.PingrespPacket:
-		c.log.Debug("send pingresp")
+		log.Debug("send pingresp")
 	}
 
 	c.sendCh <- packet
@@ -164,17 +166,19 @@ func (c *Client) receive(packet packets.ControlPacket) (err error) {
 	// KeepAlive
 	c.keepAlive.Kick()
 
+	log := c.log.With(zap.String("addr", c.remoteAddr))
+
 	// Handle
 	switch packet := packet.(type) {
 	case *packets.ConnectPacket:
-		c.log.Debug(
+		log.Debug(
 			"receive connect",
-			zap.String("cid", packet.ClientIdentifier),
+			zap.String("id", packet.ClientIdentifier),
 			zap.String("username", packet.Username),
 		)
 		return c.handleConnect(packet)
 	case *packets.PublishPacket:
-		c.log.Debug(
+		log.Debug(
 			"receive publish",
 			zap.Bool("dup", packet.Dup),
 			zap.Bool("ret", packet.Retain),
@@ -185,48 +189,48 @@ func (c *Client) receive(packet packets.ControlPacket) (err error) {
 		)
 		return c.handlePublish(packet)
 	case *packets.PubackPacket:
-		c.log.Debug(
+		log.Debug(
 			"receive puback",
 			zap.Uint16("mid", packet.MessageID),
 		)
 		return c.handlePuback(packet)
 	case *packets.PubrecPacket:
-		c.log.Debug(
+		log.Debug(
 			"receive pubrec",
 			zap.Uint16("mid", packet.MessageID),
 		)
 		return c.handlePubrec(packet)
 	case *packets.PubrelPacket:
-		c.log.Debug(
+		log.Debug(
 			"receive pubrel",
 			zap.Uint16("mid", packet.MessageID),
 		)
 		return c.handlePubrel(packet)
 	case *packets.PubcompPacket:
-		c.log.Debug(
+		log.Debug(
 			"receive pubcomp",
 			zap.Uint16("mid", packet.MessageID),
 		)
 		return c.handlePubcomp(packet)
 	case *packets.SubscribePacket:
-		c.log.Debug(
+		log.Debug(
 			"receive subscribe",
 			zap.Uint16("mid", packet.MessageID),
 			zap.Strings("topics", packet.Topics),
 		)
 		return c.handleSubscribe(packet)
 	case *packets.UnsubscribePacket:
-		c.log.Debug(
+		log.Debug(
 			"receive unsubscribe",
 			zap.Uint16("mid", packet.MessageID),
 			zap.Strings("topics", packet.Topics),
 		)
 		return c.handleUnsubscribe(packet)
 	case *packets.PingreqPacket:
-		c.log.Debug("receive pingreq")
+		log.Debug("receive pingreq")
 		return c.handlePingreq(packet)
 	case *packets.DisconnectPacket:
-		c.log.Debug("receive disconnect")
+		log.Debug("receive disconnect")
 		return c.handleDisconnect(packet)
 	default:
 		return errProtocolViolation

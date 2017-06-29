@@ -22,6 +22,7 @@ var cmd = &cobra.Command{
 	Short: "The SQuaTT MQTT Server",
 	Run: func(cmd *cobra.Command, args []string) {
 		defer func() { log.Info("server stopped") }()
+		log.Info("server starting")
 
 		listen := cfg.GetString("listen")
 
@@ -35,8 +36,6 @@ var cmd = &cobra.Command{
 				log.Fatal("Could not start server", zap.Error(err))
 			}
 		}()
-
-		log.Info("server started", zap.String("listen", listen))
 
 		if cfg.GetBool("debug") {
 			go func() {
@@ -70,7 +69,7 @@ func init() {
 			log, _ = zap.NewDevelopment()
 		}
 		if err := cfg.ReadInConfig(); err != nil {
-			log.Info("Not using config file", zap.Error(err))
+			log.Info("not using config file", zap.Error(err))
 		}
 	})
 }

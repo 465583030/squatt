@@ -18,8 +18,9 @@ var (
 
 // Client connection
 type Client struct {
-	server *Server
-	log    *zap.Logger
+	server     *Server
+	log        *zap.Logger
+	remoteAddr string
 
 	session   *session.Session
 	keepAlive *watchdog
@@ -69,7 +70,7 @@ func (s *Server) NewClient() *Client {
 
 // Handle the client connection
 func (c *Client) Handle(conn net.Conn) error {
-	c.log = c.log.With(zap.String("addr", conn.RemoteAddr().String()))
+	c.remoteAddr = conn.RemoteAddr().String()
 	return c.handle(conn)
 }
 
