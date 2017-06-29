@@ -1,0 +1,19 @@
+[[constraint]]
+  branch = "master"
+  name = "github.com/eclipse/paho.mqtt.golang"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/segmentio/ksuid"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/spf13/cobra"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/spf13/viper"
+
+[[constraint]]
+  branch = "master"
+  name = "go.uber.org/zap"
