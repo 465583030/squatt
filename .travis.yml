@@ -4,6 +4,7 @@ go:
   - 1.8
 
 install:
+  - make dev-setup
   - make deps
   - go get -u github.com/mattn/goveralls
 
