@@ -21,3 +21,8 @@ test:
 
 lint-full:
 	gometalinter --deadline=300s --vendor --disable errcheck --disable gas ./...
+
+.PHONY: cert
+
+cert:
+	go run $$(go env GOROOT)/src/crypto/tls/generate_cert.go -ca -host localhost

@@ -84,3 +84,4 @@ $RECYCLE.BIN/
 
 vendor/
 *.coverprofile
+*.pem

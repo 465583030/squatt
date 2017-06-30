@@ -2,6 +2,7 @@
 package server
 
 import (
+	"crypto/tls"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -15,7 +16,7 @@ import (
 
 type serverStats struct {
 	// BEGIN sync/atomic aligned
-	connections int64
+	sockets int64
 	// END sync/atomic aligned
 }
 
@@ -94,6 +95,16 @@ func (s *Server) ListenAndServe(addr string) error {
 	return s.Serve(lis)
 }
 
+// ListenAndServeTLS is similar to ListenAndServe, except that it uses TLS
+func (s *Server) ListenAndServeTLS(addr string, config *tls.Config) error {
+	lis, err := tls.Listen("tcp", addr, config)
+	if err != nil {
+		return err
+	}
+	s.log.Debug("tls server listening", zap.String("addr", lis.Addr().String()))
+	return s.Serve(lis)
+}
+
 // Serve on the given listener
 func (s *Server) Serve(lis net.Listener) error {
 	for {
@@ -103,10 +114,10 @@ func (s *Server) Serve(lis net.Listener) error {
 		}
 		go func() {
 			defer conn.Close()
-			conns := atomic.AddInt64(&s.stats.connections, 1)
+			conns := atomic.AddInt64(&s.stats.sockets, 1)
 			s.log.Debug("accept connection", zap.String("addr", conn.RemoteAddr().String()), zap.Int64("conns", conns))
 			s.NewClient().Handle(conn)
-			conns = atomic.AddInt64(&s.stats.connections, -1)
+			conns = atomic.AddInt64(&s.stats.sockets, -1)
 			s.log.Debug("release connection", zap.String("addr", conn.RemoteAddr().String()), zap.Int64("conns", conns), zap.Error(err))
 		}()
 	}
