@@ -155,10 +155,10 @@ func TestServer(t *testing.T) {
 				panic(err)
 			}
 			time.Sleep(10 * time.Millisecond)
-			Convey(`Then the server should have 1 connection`, func() { So(s.stats.connections, ShouldEqual, 1) })
+			Convey(`Then the server should have 1 connection`, func() { So(s.stats.sockets, ShouldEqual, 1) })
 			Convey(`When disconnecting the client`, func() {
 				conn.Close()
-				Convey(`Then the server should have 0 connections`, func() { So(s.stats.connections, ShouldEqual, 0) })
+				Convey(`Then the server should have 0 connections`, func() { So(s.stats.sockets, ShouldEqual, 0) })
 			})
 		})
 		Convey(`When trying to listen on a busy port`, func() {
